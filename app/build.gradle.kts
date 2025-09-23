@@ -2,6 +2,9 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    kotlin("plugin.serialization") version "1.6.0"
+    id("kotlin-kapt")
+    id("com.google.dagger.hilt.android") version "2.57.1"
 }
 
 android {
@@ -40,6 +43,17 @@ android {
 }
 
 dependencies {
+    //DI
+    implementation(libs.dagger.hilt.android)
+    implementation(libs.dagger.hilt.navigation.compose)
+    kapt(libs.dagger.hilt.compiler)
+
+    //NETWORK
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.logging.interceptor)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
