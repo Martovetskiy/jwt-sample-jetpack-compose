@@ -4,17 +4,17 @@ import me.bodnarsg.jwtsample.domain.repository.AuthRepository
 import me.bodnarsg.jwtsample.domain.repository.TokenStorageRepository
 import javax.inject.Inject
 
-class RegistrationUseCase @Inject constructor(
-    val authRepository: AuthRepository,
-    val tokenStorageRepository: TokenStorageRepository
+class LoginUseCase @Inject constructor(
+    private val authRepository: AuthRepository,
+    private val tokenStorageRepository: TokenStorageRepository
 ) {
-    suspend operator fun invoke(email: String, password: String, name: String): Result<Unit> {
-        val registrationResult = authRepository.registration(email, password, name)
-        if (registrationResult.isFailure) {
-            return Result.failure(registrationResult.exceptionOrNull() ?: Exception("Unknown error during registration"))
+    suspend operator fun invoke(email: String, password: String): Result<Unit> {
+        val loginResult = authRepository.login(email, password)
+        if (loginResult.isFailure) {
+            return Result.failure(loginResult.exceptionOrNull() ?: Exception("Unknown error during login"))
         }
 
-        return authRepository.login(email, password).fold(
+        return loginResult.fold(
             onSuccess = { authToken ->
                 tokenStorageRepository.saveAccessToken(authToken.accessToken)
                 tokenStorageRepository.saveRefreshToken(authToken.refreshToken)

@@ -1,14 +1,19 @@
-package me.bodnarsg.jwtsample.presentation.auth.registration
+package me.bodnarsg.jwtsample.presentation.auth.login
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -16,18 +21,36 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegistrationView(
-    viewModel: RegistrationViewModel = hiltViewModel(),
+fun LoginView(
+    viewModel: LoginViewModel = hiltViewModel(),
     navController: NavController
 ) {
     val email by viewModel.email
     val password by viewModel.password
-    val secondaryPassword by viewModel.secondaryPassword
-    val name by viewModel.name
 
 
-    Scaffold { innerPadding ->
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(text = "Login") },
+                navigationIcon = {
+                    IconButton(
+                        onClick = {
+                            navController.popBackStack()
+                        }
+                    ) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = null,
+                            )
+                    }
+                }
+            )
+        }
+    )
+    { innerPadding ->
         Column(
             modifier = Modifier
                 .padding(innerPadding)
@@ -45,32 +68,13 @@ fun RegistrationView(
                 value = password,
                 onValueChange = { viewModel.setPassword(it) },
                 label = { Text(text = "Password") },
-                isError = !viewModel.passwordsMatch()
             )
-            TextField(
-                value = secondaryPassword,
-                onValueChange = { viewModel.setSecondaryPassword(it) },
-                label = { Text(text = "Repeat password") },
-                isError = !viewModel.passwordsMatch()
-            )
-            TextField(
-                value = name,
-                onValueChange = { viewModel.setName(it) },
-                label = { Text(text = "Name") }
-            )
-            TextButton(
-                onClick = {
-                    navController.navigate("auth/login")
-                }
-            ) {
-                Text(text = "Already have an account? Log in")
-            }
             Button(
                 onClick = {
-                    viewModel.registration(navController)
+                    viewModel.login(navController)
                 }
             ) {
-                Text(text = "Register")
+                Text(text = "Login")
             }
             if (viewModel.errorMessage.value.isNotEmpty()) {
                 Text(text = viewModel.errorMessage.value, color = androidx.compose.ui.graphics.Color.Red)

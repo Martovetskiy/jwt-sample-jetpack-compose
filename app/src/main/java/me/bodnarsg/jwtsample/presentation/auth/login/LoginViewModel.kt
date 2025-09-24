@@ -1,4 +1,4 @@
-package me.bodnarsg.jwtsample.presentation.auth.registration
+package me.bodnarsg.jwtsample.presentation.auth.login
 
 import android.util.Log
 import androidx.compose.runtime.MutableState
@@ -9,25 +9,20 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import me.bodnarsg.jwtsample.domain.usecase.RegistrationUseCase
+import me.bodnarsg.jwtsample.domain.usecase.LoginUseCase
 import me.bodnarsg.jwtsample.navigation.Routes
 import javax.inject.Inject
 
 @HiltViewModel
-class RegistrationViewModel @Inject constructor(
-    private val registrationUseCase: RegistrationUseCase
-): ViewModel()
-{
+class LoginViewModel @Inject constructor(
+    private val loginUseCase: LoginUseCase
+): ViewModel() {
     private val _email: MutableState<String> = mutableStateOf("")
     private val _password: MutableState<String> = mutableStateOf("")
-    private val _secondaryPassword: MutableState<String> = mutableStateOf("")
-    private val _name: MutableState<String> = mutableStateOf("")
     private val _errorMessage: MutableState<String> = mutableStateOf("")
 
     val email: State<String> = _email
     val password: State<String> = _password
-    val secondaryPassword: State<String> = _secondaryPassword
-    val name: State<String> = _name
     val errorMessage: State<String> = _errorMessage
 
     fun setEmail(value: String) {
@@ -38,35 +33,23 @@ class RegistrationViewModel @Inject constructor(
         _password.value = value
     }
 
-    fun setSecondaryPassword(value: String) {
-        _secondaryPassword.value = value
-    }
 
-    fun setName(value: String) {
-        _name.value = value
-    }
-
-    fun passwordsMatch(): Boolean {
-        return _password.value == _secondaryPassword.value
-    }
-
-    fun registration(navController: NavController){
+    fun login(navController: NavController){
         viewModelScope.launch {
             _errorMessage.value = ""
-            registrationUseCase(_email.value, _password.value, _name.value).fold(
+            loginUseCase(_email.value, _password.value).fold(
                 onSuccess = {
                     navController.navigate(Routes.MAIN_GRAPH) {
                         popUpTo(Routes.AUTH_GRAPH) { inclusive = true }
                         launchSingleTop = true
                     }
-                    Log.d("RegistrationViewModel", "registration: success")
+                    Log.d("LoginViewModel", "login: success")
                 },
                 onFailure = {
                     _errorMessage.value = it.message ?: "Unknown error"
-                    Log.e("RegistrationViewModel", "registration: failure", it)
+                    Log.e("LoginViewModel", "login: failure", it)
                 }
             )
         }
     }
-
 }
